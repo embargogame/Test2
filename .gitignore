@@ -1,12 +1,287 @@
-*.class
+import java.awt.*; 
+import java.awt.event.*; 
+import javax.swing.*; 
+import java.io.*; 
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+public class FileViewer extends JFrame{
+   //attribute
+   private JTextField jtfileName; 
+   private JTextArea jtaReadArea; 
+   private JButton jbSetFont; 
+   private JRadioButton jrFont10,jrFont12,jrFont14,jrFont16; 
+   private ButtonGroup bgFontGroup; 
+   private JComboBox jcbFontChoice;
+   private  String[] fontStyle = {"Regular","Italic", "Bold", "Bold Italic"};  
+   private JMenuItem jmNew, jmOpen, jmSave, jmSaveAs, jmFile,jmExit, aboutViewer; 
+   private JMenu jHelp; 
+   
+   private String name = "Serif";
+   private int italicStyle = Font.ITALIC; 
+   private int boldStyle = Font.BOLD; 
+   private int plainStyle = Font.PLAIN; 
+   private int boldItalicSyle = Font.ITALIC | Font.BOLD; 
+   private int size10 = 10; 
+   private int size12 = 12; 
+   private  int size14 = 14; 
+   private int size16 = 16; 
+   
+   JFileChooser chooser = new JFileChooser();
 
-# Package Files #
-*.jar
-*.war
-*.ear
+   public static void main(String[]args)
+   {
+      FileViewer fileViews = new FileViewer(); 
+   }
+   
+   // constructor 
+   public FileViewer(){
+      
+      //JPanel Area
+      JPanel jpArea = new JPanel(); 
+     
+      jtaReadArea = new JTextArea(25,30); 
+      
+      JScrollPane scrollPane = new JScrollPane(jtaReadArea); 
+        
+      add(scrollPane,BorderLayout.WEST); 
+     
+     //JPanel RightColumn for Combo Box, Radio Buttons, and Font Button 
+      
+      JPanel jpRightColumn = new JPanel(); 
+     
+      jcbFontChoice = new JComboBox(fontStyle); 
+     
+      jpRightColumn.add(jcbFontChoice); 
+     
+      add(jpRightColumn ); 
+    
+      jrFont10 = new JRadioButton("10",true); 
+      jrFont12 = new JRadioButton("12"); 
+      jrFont14 = new JRadioButton("14"); 
+      jrFont16 = new JRadioButton("16"); 
+    
+     
+      bgFontGroup = new ButtonGroup();
+     
+      bgFontGroup.add(jrFont10);
+      bgFontGroup.add(jrFont12);
+      bgFontGroup.add(jrFont14);
+      bgFontGroup.add(jrFont16);
+     
+      JPanel jpFontGroup = new JPanel(new GridLayout(4,1)); 
+       
+      jpFontGroup.add(jrFont10);
+      jpFontGroup.add(jrFont12);
+      jpFontGroup.add(jrFont14);
+      jpFontGroup.add(jrFont16);
+     
+      jpRightColumn.add(jpFontGroup); 
+    
+      jbSetFont = new JButton("Set Font"); 
+     
+      jpRightColumn.add(jbSetFont);
+      
+      JLabel jlfileName = new JLabel("File Name:"); 
+    
+      jtfileName = new JTextField(10); 
+   
+      JPanel jpTextBox = new JPanel(); 
+     
+      jpTextBox.add(jlfileName); 
+      jpTextBox.add(jtfileName); 
+      
+      add(jpTextBox, BorderLayout.SOUTH); 
+      
+     //MenuBar called topBar 
+      JMenuBar topBar = new JMenuBar(); 
+     
+     //adding it to JFrame 
+      setJMenuBar(topBar); 
+    
+      //File Menu 
+      jmFile = new JMenu("File"); 
+     
+      topBar.add(jmFile); 
+     // New submenu
+      jmNew = new JMenuItem("New"); 
+      jmFile.add(new JSeparator());
+      jmNew.setMnemonic('N'); 
+      jmFile.add(jmNew); 
+       
+     //Open submenu
+      jmOpen = new JMenuItem("Open...");
+      jmFile.add(new JSeparator());
+      jmOpen.setMnemonic('O');
+      jmFile.add(jmOpen); 
+    
+      
+         //Save submenu 
+      jmSave = new JMenuItem("Save"); 
+      jmFile.add(new JSeparator());
+      jmSave.setMnemonic('S'); 
+      jmFile.add(jmSave); 
+          
+        //Save As submenu
+      jmSaveAs = new JMenuItem("Save As...");
+      jmSaveAs.setMnemonic('S');
+      jmFile.add(jmSaveAs); 
+          
+         //Exit submenu
+      jmExit = new JMenuItem("Exit"); 
+      jmFile.add(new JSeparator());
+      jmExit.setMnemonic('E');
+      jmFile.add(jmExit); 
+          
+      //Tools Menu 
+      JMenu Tools = new JMenu("Tools"); 
+            
+      topBar.add(Tools);   
+           
+        //Word Count submenu 
+      JMenuItem wordCount = new JMenuItem("Word Count"); 
+      Tools.add(wordCount); 
+      
+      //Help Menu 
+      jHelp = new JMenu("Help");
+      
+         //About viewer submenu 
+      aboutViewer = new JMenuItem("About FileViewer"); 
+          
+      jHelp.add(aboutViewer); 
+       
+      topBar.add(jHelp); 
+              
+     
+      FileListener fileAction = new FileListener(); 
+      
+      HelpListener helpListen = new HelpListener();
+    
+      jmNew.addActionListener(fileAction); 
+      
+      jmSave.addActionListener(fileAction); 
+      
+      jmOpen.addActionListener(fileAction);  
+      
+      jmExit.addActionListener(fileAction); 
+      
+      aboutViewer.addActionListener(helpListen); 
+      
+      jbSetFont.addActionListener(fileAction); 
+       
+     //for JFrame 
+      setTitle("FileViewer"); 
+      setDefaultCloseOperation(EXIT_ON_CLOSE); 
+      setLocationRelativeTo(null); 
+      setSize(450, 350); 
+      setVisible(true); 
+   }//end constructor 
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+ private void settingFont(){
+ 
+         int size = 0; 
+           
+            if(jrFont10.isSelected()){
+               size = 10;
+            }
+            if(jrFont12.isSelected()){
+               size = 12;
+            }
+            if(jrFont14.isSelected()){
+               size = 14;
+            }
+         
+            if(jrFont16.isSelected()){
+               size = 16;
+            }
+            int style = jcbFontChoice.getSelectedIndex(); 
+            int regularStyle = Font.PLAIN; 
+            int italicStyle = Font.ITALIC; 
+            int boldStyle = Font.BOLD; 
+            int boldItalicStyle = Font.BOLD * Font.ITALIC; 
+         
+            if(style == 0){
+               jtaReadArea.setFont(new Font("Serif", regularStyle, size)); 
+               System.out.println("Regular"); 
+            }
+            if(style == 1){
+               jtaReadArea.setFont(new Font("Serif",  italicStyle, size)); 
+               System.out.println("Italics"); 
+            }
+            if(style == 2){
+               jtaReadArea.setFont(new Font("Serif",  boldStyle, size)); 
+               System.out.println("Italics"); 
+            }
+            if(style == 3){
+               jtaReadArea.setFont(new Font("Serif", boldItalicStyle, size)); 
+               System.out.println("Italics"); 
+            }
+   
+ }  
+  //File Listener class
+   class FileListener implements ActionListener{
+     
+      public void actionPerformed(ActionEvent ae){
+      
+         Object actionObj = ae.getSource(); 
+         
+         if(actionObj == jmNew)
+         {
+            jtaReadArea.setText(null);
+            jtfileName.setText(null); 
+         }
+         
+         else if(actionObj == jmOpen){
+         
+            int returnVal = chooser.showOpenDialog(jmOpen);
+             if(returnVal == JFileChooser.APPROVE_OPTION) {
+            System.out.println("You chose to open this file: " +
+            chooser.getSelectedFile().getName());
+           } 
+        }
+        else if(actionObj == jmSave){
+            String result = ""; 
+            String writeFile = jtfileName.getText(); 
+            
+            try{
+                FileWriter fw = new FileWriter(writeFile,true); 
+                BufferedWriter bw = new BufferedWriter(fw); 
+                PrintWriter pw = new PrintWriter(bw); 
+               
+               pw.println(jtaReadArea.getText()); 
+               
+               pw.flush(); 
+               pw.close(); 
+               fw.close(); 
+               bw.close(); 
+            }
+            catch(Exception nfe){
+               result = "File not found"; 
+               JOptionPane.showMessageDialog(null,result); 
+            } 
+        }
+         
+         else if(actionObj == jbSetFont){
+      
+           settingFont();
+            }
+          else if(actionObj == jmExit){
+            System.exit(0);
+         }
+      }
+   }
+}//end of FileViewer class
+
+ 
+   //Helper Listener Class
+class HelpListener implements ActionListener
+{
+   public void actionPerformed(ActionEvent ae){
+      Object actionObj = ae.getSource(); 
+       
+      {
+          String msg = "121: Fileview \n" +"Version 4.0 \n" + "Februrary 17, 2015\n" + "Developed By David Player\n"; 
+         JOptionPane.showMessageDialog(null, msg, "About File Viewer " ,  JOptionPane.PLAIN_MESSAGE ); 
+      }
+   }
+
+}
+   
